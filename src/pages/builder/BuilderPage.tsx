@@ -12,7 +12,7 @@ import { Step4_PickVariant } from './steps/Step4_PickVariant'
 const STEPS = [
   { label: 'תוכן',   description: 'טקסט, לוגו ותמונות' },
   { label: 'טופס',   description: 'שדות יצירת קשר' },
-  { label: 'עיצוב',  description: 'צבעים ומראה' },
+  { label: 'עיצוב',  description: 'סגנון, צבעים ומראה' },
   { label: 'יוצר…',  description: 'AI מעצב את הדף' },
 ]
 
