@@ -1,10 +1,31 @@
 import api from './api'
 
+export interface ContentIdeas {
+  headline_line1: string[]
+  headline_line2: string[]
+  headline_line3: string[]
+  trust_badge: string[]
+  subtext: string[]
+  cta: string[]
+  services: Array<{ icon: string; label: string }>
+}
+
+export interface VariantContent {
+  headline_line1: string
+  headline_line2: string
+  headline_line3: string
+  trust_badge: string
+  subtext: string
+  cta: string
+  services: Array<{ icon: string; label: string }>
+}
+
 export interface LandingPageContent {
   headline_line1?: string
   headline_line2?: string
   headline_line3?: string
   trust_badge?: string
+  cta?: string
   subtext?: string
   services?: Array<{ icon: string; label: string }>
 }
@@ -32,7 +53,7 @@ export interface LandingPageVariant {
 
 export interface LandingPageAsset {
   id: number
-  type: 'logo' | 'image'
+  type: 'logo' | 'image' | 'reference'
   path: string
   original_name: string
   url: string
@@ -92,4 +113,7 @@ export const landingPageService = {
 
   aiEdit: (id: number, instruction: string) =>
     api.post<{ html_content: string; variant_id: number }>(`/landing-pages/${id}/ai-edit`, { instruction }),
+
+  getContentIdeas: (data: { title: string; input_text?: string; input_url?: string }) =>
+    api.post<ContentIdeas>('/content-ideas', data),
 }

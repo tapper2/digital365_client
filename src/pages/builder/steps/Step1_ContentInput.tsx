@@ -1,19 +1,22 @@
 import { useRef } from 'react'
-import { Upload, X } from 'lucide-react'
+import { Upload, X, LayoutTemplate } from 'lucide-react'
 import { useBuilderStore } from '../../../store/builderStore'
 import { Input, Textarea } from '../../../components/ui/Input'
 
 interface Props {
   logo: File | null
   images: File[]
+  referenceImage: File | null
   setLogo: (f: File | null) => void
   setImages: (f: File[]) => void
+  setReferenceImage: (f: File | null) => void
 }
 
-export function Step1_ContentInput({ logo, images, setLogo, setImages }: Props) {
+export function Step1_ContentInput({ logo, images, referenceImage, setLogo, setImages, setReferenceImage }: Props) {
   const { inputData, setInputData } = useBuilderStore()
-  const logoRef = useRef<HTMLInputElement>(null)
-  const imgRef  = useRef<HTMLInputElement>(null)
+  const logoRef   = useRef<HTMLInputElement>(null)
+  const imgRef    = useRef<HTMLInputElement>(null)
+  const refRef    = useRef<HTMLInputElement>(null)
 
   const addImages = (files: FileList | null) => {
     if (!files) return
@@ -70,7 +73,7 @@ export function Step1_ContentInput({ logo, images, setLogo, setImages }: Props) 
           <input ref={logoRef} type="file" accept="image/*" className="hidden" onChange={(e) => setLogo(e.target.files?.[0] ?? null)} />
         </div>
 
-        {/* Images */}
+        {/* Person images */}
         <div>
           <p className="text-sm text-slate-600 font-medium mb-2">תמונות ({images.length}/5)</p>
           <button
@@ -98,6 +101,44 @@ export function Step1_ContentInput({ logo, images, setLogo, setImages }: Props) 
             </div>
           )}
         </div>
+      </div>
+
+      {/* Reference landing page */}
+      <div>
+        <p className="text-sm text-slate-600 font-medium mb-1">עמוד נחיתה לדוגמא (אופציונלי)</p>
+        <p className="text-xs text-slate-400 mb-2">העלה צילום מסך של דף שאוהב — ה-AI ינסה ליצור עיצוב דומה בסגנון, צבעים ופונטים</p>
+
+        {referenceImage ? (
+          <div className="relative rounded-xl overflow-hidden border border-indigo-200 bg-indigo-50">
+            <img
+              src={URL.createObjectURL(referenceImage)}
+              alt="reference"
+              className="w-full h-40 object-cover object-top"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-end justify-between p-3">
+              <div className="flex items-center gap-2">
+                <LayoutTemplate className="w-4 h-4 text-white" />
+                <span className="text-xs text-white font-medium truncate max-w-[200px]">{referenceImage.name}</span>
+              </div>
+              <button
+                onClick={() => setReferenceImage(null)}
+                className="w-7 h-7 bg-red-500 rounded-full flex items-center justify-center shadow"
+              >
+                <X className="w-4 h-4 text-white" />
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={() => refRef.current?.click()}
+            className="w-full border-2 border-dashed border-slate-200 hover:border-indigo-400 rounded-xl p-6 flex flex-col items-center gap-2 transition-colors text-slate-400 hover:text-indigo-600 bg-white"
+          >
+            <LayoutTemplate className="w-6 h-6" />
+            <span className="text-xs font-medium">העלה עמוד לדוגמא</span>
+            <span className="text-xs">JPG, PNG, WebP</span>
+          </button>
+        )}
+        <input ref={refRef} type="file" accept="image/*" className="hidden" onChange={(e) => setReferenceImage(e.target.files?.[0] ?? null)} />
       </div>
     </div>
   )

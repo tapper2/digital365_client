@@ -3,13 +3,6 @@ import { Check } from 'lucide-react'
 import { useBuilderStore } from '../../../store/builderStore'
 import { landingPageService, type LandingPageStyle } from '../../../services/landingPageService'
 
-const COLOR_PRESETS = [
-  { label: 'זהב & שחור',   bg_color: '#0d1117', text_color: '#ffffff', accent_color: '#B8952A', button_color: '#B8952A' },
-  { label: 'כחול & שחור',  bg_color: '#0a0f1e', text_color: '#ffffff', accent_color: '#2563EB', button_color: '#2563EB' },
-  { label: 'ירוק & שחור',  bg_color: '#071210', text_color: '#ffffff', accent_color: '#059669', button_color: '#059669' },
-  { label: 'סגול & שחור',  bg_color: '#0d0814', text_color: '#ffffff', accent_color: '#7C3AED', button_color: '#7C3AED' },
-]
-
 const CONTACT_FIELDS = [
   { key: 'phone',         label: 'טלפון', placeholder: '054-1234567' },
   { key: 'whatsapp',      label: 'WhatsApp', placeholder: '054-1234567' },
@@ -20,12 +13,14 @@ const CONTACT_FIELDS = [
 
 export function Step3_Colors() {
   const { settings, setSettings, selectedStyleIds, toggleStyleId } = useBuilderStore()
-  const [styles, setStyles]   = useState<LandingPageStyle[]>([])
+  const [styles, setStyles]         = useState<LandingPageStyle[]>([])
   const [loadingStyles, setLoadingStyles] = useState(true)
+  const [stylesError, setStylesError]     = useState(false)
 
   useEffect(() => {
     landingPageService.getStyles()
       .then(({ data }) => setStyles(data))
+      .catch(() => setStylesError(true))
       .finally(() => setLoadingStyles(false))
   }, [])
 
@@ -45,11 +40,17 @@ export function Step3_Colors() {
           </span>
         </div>
 
-        {loadingStyles ? (
-          <div className="flex justify-center py-6">
+        {loadingStyles && (
+          <div className="flex justify-center py-8">
             <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
           </div>
-        ) : (
+        )}
+
+        {!loadingStyles && stylesError && (
+          <p className="text-sm text-red-500 text-center py-4">שגיאה בטעינת הסגנונות. רענן את הדף.</p>
+        )}
+
+        {!loadingStyles && !stylesError && (
           <div className="grid grid-cols-3 gap-2">
             {styles.map((style) => {
               const isSelected = selectedStyleIds.includes(style.id)
@@ -88,43 +89,9 @@ export function Step3_Colors() {
 
         {selectedStyleIds.length === 2 && (
           <p className="text-xs text-slate-400 mt-2 text-center">
-            כדי לבחור סגנון אחר — בטל את הבחירה של אחד מהנבחרים
+            כדי לבחור סגנון אחר — בטל בחירה של אחד מהנבחרים
           </p>
         )}
-      </div>
-
-      {/* ── Color presets ─────────────────────────────────── */}
-      <div>
-        <p className="text-sm text-slate-600 font-medium mb-3">ערכת צבעים</p>
-        <div className="grid grid-cols-2 gap-3">
-          {COLOR_PRESETS.map((preset) => (
-            <button
-              key={preset.label}
-              onClick={() => setSettings(preset)}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50 transition-all bg-white"
-            >
-              <div className="flex gap-1.5">
-                <div className="w-5 h-5 rounded-full border border-slate-300" style={{ background: preset.bg_color }} />
-                <div className="w-5 h-5 rounded-full border border-slate-300" style={{ background: preset.accent_color }} />
-              </div>
-              <span className="text-sm text-slate-700">{preset.label}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* ── Custom accent ─────────────────────────────────── */}
-      <div>
-        <label className="text-sm text-slate-600 font-medium block mb-2">צבע Accent מותאם אישית</label>
-        <div className="flex items-center gap-3 bg-white border border-slate-200 rounded-xl px-3 py-2 w-fit">
-          <input
-            type="color"
-            value={settings.accent_color ?? '#B8952A'}
-            onChange={(e) => setSettings({ accent_color: e.target.value, button_color: e.target.value })}
-            className="w-8 h-8 rounded cursor-pointer border-0 bg-transparent"
-          />
-          <span className="text-sm text-slate-500 font-mono">{settings.accent_color}</span>
-        </div>
       </div>
 
       {/* ── Contact / social ──────────────────────────────── */}
@@ -145,6 +112,7 @@ export function Step3_Colors() {
           ))}
         </div>
       </div>
+
     </div>
   )
 }
